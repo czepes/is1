@@ -6,109 +6,142 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>411</width>
-    <height>359</height>
+    <width>366</width>
+    <height>456</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Cipher program</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="formLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>411</width>
-      <height>334</height>
-     </rect>
-    </property>
-    <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="1">
-      <widget class="QLabel" name="inputLabel">
-       <property name="text">
-        <string>Input</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QPlainTextEdit" name="inputEdit">
-       <property name="placeholderText">
-        <string>Input text here to encrypt or decrypt it</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLabel" name="keyLabel">
-       <property name="text">
-        <string>Key</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QPlainTextEdit" name="keyEdit">
-       <property name="placeholderText">
-        <string>Key will be shown here after the encrypting</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QPlainTextEdit" name="outputEdit">
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-       <property name="placeholderText">
-        <string>Result of encrypting and decrypting will be shown here</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="1">
-      <widget class="Line" name="line">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="1">
-      <layout class="QHBoxLayout" name="buttonsLayout">
-       <item>
-        <widget class="QPushButton" name="encryptButton">
-         <property name="styleSheet">
-          <string notr="true"/>
-         </property>
-         <property name="text">
-          <string>Encrypt</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="decryptButton">
-         <property name="text">
-          <string>Decrypt</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLabel" name="outputLabel">
-       <property name="text">
-        <string>Output</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>411</width>
-     <height>21</height>
-    </rect>
-   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="1">
+       <widget class="QLabel" name="inputLabel">
+        <property name="text">
+         <string>Input</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPlainTextEdit" name="inputEdit">
+        <property name="placeholderText">
+         <string>Input text here to encrypt or decrypt it</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="keyLabel">
+        <property name="text">
+         <string>Key</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QPlainTextEdit" name="keyEdit">
+        <property name="placeholderText">
+         <string>Key will be shown here after the encrypting</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLabel" name="outputLabel">
+        <property name="text">
+         <string>Output</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QPlainTextEdit" name="outputEdit">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="placeholderText">
+         <string>Result of encrypting and decrypting will be shown here</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <layout class="QFormLayout" name="methodLayout">
+        <item row="1" column="1">
+         <widget class="QLabel" name="basicLabel">
+          <property name="text">
+           <string>Based on Magic Squares of odd and doubly even order</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLabel" name="enhancedLabel">
+          <property name="text">
+           <string>Aadditionally performs permutations in Magic Squares</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="methodLabel">
+          <property name="text">
+           <string>Sipher Method</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QRadioButton" name="enhancedRadio">
+          <property name="text">
+           <string>Enhanced</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QRadioButton" name="basicRadio">
+          <property name="text">
+           <string>Basic</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="descriptionLabel">
+          <property name="text">
+           <string>Method Description</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="8" column="1">
+       <layout class="QHBoxLayout" name="buttonsLayout">
+        <item>
+         <widget class="QPushButton" name="encryptButton">
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="text">
+           <string>Encrypt</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="decryptButton">
+          <property name="text">
+           <string>Decrypt</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+   </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>

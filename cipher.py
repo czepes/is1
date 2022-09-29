@@ -3,39 +3,48 @@
 import numpy as np
 
 from math import sqrt, ceil
-from magic_square import create_square
+from magic_square import create_square, transform_magic_square
 
 NO_SYMBOL = '_'
-DELIMITER = '/'
+DELIMITER = '\''
 
 
 def encrypt(
         text: str,
+        transform: bool = False,
         empty: str = NO_SYMBOL,
         delimiter: str = DELIMITER
 ) -> tuple[str, str]:
     """
-    Encrypts text
+    Encrypts text using Magic Squares
     :param text: Text to encrypt
+    :param transform: Flag to enable Magic Square's random transformations
     :param empty: Symbol that represents absence of symbol (default = '_')
     :param delimiter: Delimiter for values of key (default = '/')
     :return: Key and ciphertext
     """
-    # 1D encryption
     text_len = len(text)
-    layout = create_square(ceil(sqrt(text_len))).flatten()
-    cipher = np.full(shape=layout.size, fill_value='', dtype=str)
+    layout = create_square(ceil(sqrt(text_len)))
 
+    # Magic square transformation
+    if transform:
+        layout = transform_magic_square(layout)
+
+    # Reducing unnecessary 2D
+    layout = layout.flatten()
+
+    # Encryption
+    ciphertext = np.full(shape=layout.size, fill_value='', dtype=str)
     for i in range(layout.size):
         if layout[i] <= text_len:
-            cipher[i] = text[layout[i] - 1]
+            ciphertext[i] = text[layout[i] - 1]
         else:
-            cipher[i] = empty
+            ciphertext[i] = empty
 
     # Convert to string
     key = delimiter.join([str(i) for i in layout])
 
-    return key, ''.join(cipher)
+    return key, ''.join(ciphertext)
 
 
 def decrypt(
@@ -45,7 +54,7 @@ def decrypt(
         delimiter: str = DELIMITER
 ) -> tuple[bool, str]:
     """
-    Encrypts text
+    Decrypts text using Magic Square's encryption key
     :param text: Text to decrypt
     :param key: Decryption key
     :param empty: Symbol that represents absence of symbol (default = '_')
@@ -62,7 +71,7 @@ def decrypt(
         layout = np.array(
             [int(i) for i in key.split(delimiter)],
             dtype=int
-        )
+        ).flatten()
     except ValueError:
         return False, "Wrong key format"
 
@@ -80,8 +89,7 @@ def decrypt(
 
     # Decryption
     plaintext = np.full(shape=layout.size, fill_value='', dtype=str)
-    layout = layout.flatten()
     for i in range(layout.size):
         plaintext[layout[i] - 1] = text[i]
-    plaintext = ''.join(plaintext).replace(empty, '')
-    return True, plaintext
+
+    return True, ''.join(plaintext).replace(empty, '')

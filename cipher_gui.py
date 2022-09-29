@@ -17,12 +17,28 @@ class CipherWindow(QMainWindow, Form):
         super().__init__()
         self.setupUi(self)
 
-        self.encryptButton.clicked.connect(self.encrypt)
-        self.decryptButton.clicked.connect(self.decrypt)
+        # Set fields for more flexible cipher mode change
+        self.encrypt_func = encrypt
+        self.decrypt_func = decrypt
+
+        # Add signals to buttons
+        self.encryptButton.clicked.connect(self.encrypt_signal)
+        self.decryptButton.clicked.connect(self.decrypt_signal)
+
+        # Add signals to radio buttons
+        self.basicRadio.toggled.connect(self.change_mode)
+        self.enhancedRadio.toggled.connect(self.change_mode)
 
         self.show()
 
-    def encrypt(self):
+    def change_mode(self):
+        """Change encryption mode"""
+        if self.basicRadio.isChecked():
+            self.encrypt_func = encrypt
+        elif self.enhancedRadio.isChecked():
+            self.encrypt_func = lambda *args: encrypt(*args, transform=True)
+
+    def encrypt_signal(self):
         """Encryption GUI logic"""
         # Get text from input text field
         text = self.inputEdit.toPlainText()
@@ -33,7 +49,7 @@ class CipherWindow(QMainWindow, Form):
             return
 
         # Encrypt
-        key, ciphertext = encrypt(text)
+        key, ciphertext = self.encrypt_func(text)
 
         # Show result in key and output text fields
         self.keyEdit.setPlainText(key)
@@ -42,7 +58,7 @@ class CipherWindow(QMainWindow, Form):
         # Set status
         self.statusBar().showMessage(f'Encryption successful!')
 
-    def decrypt(self):
+    def decrypt_signal(self):
         """Decryption GUI logic"""
         # Get text and key from input and key text fields
         text = self.inputEdit.toPlainText()
@@ -58,7 +74,7 @@ class CipherWindow(QMainWindow, Form):
 
         # Decryption
         # Plaintext can contain decrypted message or error message
-        status, plaintext = decrypt(text, key)
+        status, plaintext = self.decrypt_func(text, key)
 
         # Set status and show result
         if status:
