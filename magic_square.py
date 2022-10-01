@@ -6,14 +6,14 @@ import numpy as np
 from random import randint
 
 START_VALUE = 1
-DEFAULT_OPS_AMOUNT = 3
+DEFAULT_OPS_AMOUNT = 5
 
 
-def create_square(size: int, start: int = START_VALUE) -> np.ndarray:
+def create_square(size: int) -> np.ndarray:
     """
-    Creates Magic Square of odd or doubly even order based on size argument
-    :param size: Edge size of Magic Square
-    :param start: Starting value (default = 1)
+    Create Magic Square of odd, even or doubly even order based on size argument
+
+    :param size: Order of Magic Square
     :return: Magic Square as numpy 2D array
     """
     # Adjust size to acceptable value
@@ -21,20 +21,22 @@ def create_square(size: int, start: int = START_VALUE) -> np.ndarray:
         if size < 3:
             pass
         elif size % 2 != 0:
-            return create_siam_square(size, start)
+            return create_odd_square(size)
         elif size % 4 == 0:
-            return create_doubly_even_square(size, start)
+            return create_double_even_square(size)
+        elif size % 2 == 0:
+            return create_even_square(size)
         size += 1
 
 
-def create_siam_square(size: int, start: int = START_VALUE) -> np.ndarray:
+def create_odd_square(size: int) -> np.ndarray:
     """
-    Creates Magic Square of odd order using Siamese method
-    :param size: Edge size of Magic Square
-    :param start: Starting value (default = 1)
+    Create Magic Square of odd order using Siamese method
+
+    :param size: Order of Magic Square
     :return: Magic Square as numpy 2D array
     """
-    # Only odd sized magic squares
+    # Only magic squares of odd order
     while size <= 2 or size % 2 == 0:
         size += 1
 
@@ -43,7 +45,7 @@ def create_siam_square(size: int, start: int = START_VALUE) -> np.ndarray:
 
     # Count - counts values put in Magic Square
     # Row & col - cursor to array value
-    count, row, col = start, 0, size // 2
+    count, row, col = 1, 0, size // 2
 
     # Cycle ends after every value is set
     while count <= size ** 2:
@@ -62,18 +64,20 @@ def create_siam_square(size: int, start: int = START_VALUE) -> np.ndarray:
     return square
 
 
-def create_doubly_even_square(size: int, start: int = START_VALUE) -> np.ndarray:
+def create_double_even_square(size: int) -> np.ndarray:
     """
-    Creates Magic Square of doubly even order using Generic pattern
-    :param size: Edge size of Magic Square
-    :param start: Starting value (default = 1)
+    Create Magic Square of doubly even order using Generic pattern
+
+    :param size: Order of Magic Square
     :return: Magic Square as numpy 2D array
     """
-    # Only double even sized magic squares
+    # Only magic squares of double even order
     while size % 4 != 0:
         size += 1
 
-    # End value
+    # Starting value
+    start = 1
+    # Ending value
     stop = start + size ** 2
 
     # Create array with elements in a sequence
@@ -111,12 +115,69 @@ def create_doubly_even_square(size: int, start: int = START_VALUE) -> np.ndarray
     return square
 
 
+def create_even_square(size: int) -> np.ndarray:
+    """
+    Create Magic Square of even order using Narayana-De la Hire's method
+
+    :param size: Order of Magic Square
+    :return: Magic Square as numpy 2D array
+    """
+    # Only magic squares of even order
+    while size % 2 != 0:
+        size += 1
+    # Create empty squares, their alphabets and replacement dictionary
+    square_a = np.full(fill_value=-1, shape=(size, size), dtype=int)
+    square_b = np.zeros_like(square_a)
+    alphabet_a = range(0, size**2, size)
+    alphabet_b = range(1, size + 1)
+    replace = dict([(alphabet_a[i], alphabet_b[i]) for i in range(size)])
+
+    # Fill main and skew diagonals
+    # for i in range(size):
+    #     square_a[i, i] = alphabet_a[i]
+    # for i in range(size):
+    #     if i % 2 == 0:
+    #         index = (i + 1) % size
+    #     else:
+    #         index = (i - 1) % size
+    #     square_a[size - i - 1, i] = alphabet_a[index]
+    for i in range(size):
+        square_a[i, i] = alphabet_a[i]
+        square_a[size - i - 1, i] = alphabet_a[i]
+
+    # Fill empty places
+    # The rule is that every alphabet symbol
+    # can occur only in the column with the opposite symbol n // 2 times
+    for i in range(size):
+        symbol, reverse_symbol = alphabet_a[i], alphabet_a[size - i - 1]
+        for col in (i, size - i - 1):
+            for row in range(size):
+                if np.count_nonzero(square_a[:, col] == symbol) != size // 2 and \
+                        symbol not in square_a[row, :] and \
+                        square_a[row, col] == -1:
+                    square_a[row, col] = symbol
+                    continue
+
+    # Fill second square based on counterclockwise rotated first square
+    # square_a = np.rot90(square_a)
+    for symbol_a, symbol_b in replace.items():
+        square_b[square_a == symbol_a] = symbol_b
+    square_b = np.rot90(square_b)
+
+    # Resulting square is sum of both squares values
+    return square_a + square_b
+
+
 def transform_magic_square(
         square: np.ndarray,
         amount: int = DEFAULT_OPS_AMOUNT
 ) -> np.ndarray:
     """
     Randomly transform Magic Square rows and columns
+
+    If passed amount of transformations is < 0,
+    then amount of operations is equal to order of the square
+
     :param square: 2D NxN numpy array
     :param amount: Amount of transformation operations (default = 5)
     :return: Transformed Magic Square
@@ -127,6 +188,9 @@ def transform_magic_square(
 
     square = deepcopy(square)
     order = square.shape[0]
+
+    if amount < 0:
+        amount = order
 
     # Operations 3 and 4 cannot be performed for squares of order 3!
     operations = 2 if order == 3 else 4
@@ -167,7 +231,6 @@ def transform_magic_square(
 
             # Swap rows i, j and their opposites
             if operation == 3:
-                print(f"Swap rows {i, j} and their opposites {i_op, j_op}")
                 square[i, :], square[j, :] = \
                     square[j, :], square[i, :].copy()
                 square[i_op, :], square[j_op, :] = \
@@ -175,7 +238,6 @@ def transform_magic_square(
 
             # Swap columns i, j and their opposites
             elif operation == 4:
-                print(f"Swap columns {i, j} and their opposites {i_op, j_op}")
                 square[:, i], square[:, j] = \
                     square[:, j], square[:, i].copy()
                 square[:, i_op], square[:, j_op] = \
@@ -186,7 +248,8 @@ def transform_magic_square(
 
 def check_square_magic(square: np.ndarray) -> bool:
     """
-    Checks magic properties of the square
+    Check magic properties of the square
+
     :param square: 2D NxN numpy array
     :return: Boolean result
     """
@@ -218,9 +281,9 @@ def check_square_magic(square: np.ndarray) -> bool:
         rl_diagonal_sum += square[i, order - i - 1]
 
     # Check diagonal sums
-    if lr_diagonal_sum != magic_const:
+    if sum(np.diag(square)) != magic_const:
         return False
-    if rl_diagonal_sum != magic_const:
+    if sum(np.diag(np.fliplr(square))) != magic_const:
         return False
 
     return True
@@ -229,6 +292,7 @@ def check_square_magic(square: np.ndarray) -> bool:
 def check_magic_square_symmetry(square: np.ndarray) -> bool:
     """
     Check symmetry properties of the Magic Square
+
     :param square: 2D NxN numpy array
     :return: Boolean result
     """

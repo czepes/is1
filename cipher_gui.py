@@ -5,7 +5,7 @@ import sys
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QMainWindow
 
-from cipher import decrypt, encrypt
+from cipher import decrypt, encrypt, decrypt_enhanced, encrypt_enhanced
 
 Form, _ = uic.loadUiType("cipher.ui")
 
@@ -17,26 +17,38 @@ class CipherWindow(QMainWindow, Form):
         super().__init__()
         self.setupUi(self)
 
-        # Set fields for more flexible cipher mode change
-        self.encrypt_func = encrypt
-        self.decrypt_func = decrypt
-
         # Add signals to buttons
         self.encryptButton.clicked.connect(self.encrypt_signal)
         self.decryptButton.clicked.connect(self.decrypt_signal)
+        self.toInputButton.clicked.connect(self.move_ciphertext)
 
         # Add signals to radio buttons
         self.basicRadio.toggled.connect(self.change_mode)
         self.enhancedRadio.toggled.connect(self.change_mode)
 
+        # Set fields for more flexible cipher mode change
+        self.encrypt_func = None
+        self.decrypt_func = None
+        self.change_mode()
+
         self.show()
+
+    def move_ciphertext(self):
+        """Copy text from output text box to input text box"""
+        self.inputEdit.setPlainText(
+            self.outputEdit.toPlainText()
+        )
 
     def change_mode(self):
         """Change encryption mode"""
         if self.basicRadio.isChecked():
-            self.encrypt_func = encrypt
+            self.encrypt_func = \
+                lambda *args: encrypt(*args, transformations=-1)
+            self.decrypt_func = decrypt
         elif self.enhancedRadio.isChecked():
-            self.encrypt_func = lambda *args: encrypt(*args, transform=True)
+            self.encrypt_func = \
+                lambda *args: encrypt_enhanced(*args, transformations=-1)
+            self.decrypt_func = decrypt_enhanced
 
     def encrypt_signal(self):
         """Encryption GUI logic"""
@@ -87,6 +99,7 @@ class CipherWindow(QMainWindow, Form):
 def main():
     """GUI startup function"""
     app = QApplication(sys.argv)
+
     window = CipherWindow()
     sys.exit(app.exec_())
 
