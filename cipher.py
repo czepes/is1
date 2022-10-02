@@ -10,6 +10,7 @@ NO_SYMBOL = '_'
 DELIMITER = '\''
 DEFAULT_TRANSFORMATIONS = 0
 MIN_BITS = 4
+MAX_OFFSET = 64
 
 
 def encrypt(
@@ -132,29 +133,31 @@ def encrypt_enhanced(
     layout = layout.flatten()
 
     # Encryption
-
     # Additional encryption step
-    offset = randint(0, layout.shape[0])
+    offset = randint(0, MAX_OFFSET)
     # Make sure that offset won't make extra 'empty' characters in ciphertext
-    unchecked = True
-    while unchecked:
+    while True:
         for i in range(len(text)):
-            # if ord(text[i]) ^ layout[i] ^ offset == ord(empty):
-            # if ord(text[i]) ^ offset == ord(empty):
-            if ord(text[i]) ^ layout[i] == ord(empty):
-                # offset += 1
-                empty = chr(ord(empty) + 1)
+            if ord(text[i]) ^ offset == ord(empty):
+                offset -= 1
                 break
         else:
-            unchecked = False
+            break
+
     ciphertext = np.full(shape=layout.size, fill_value='', dtype=str)
-    for i in range(layout.size):
-        if layout[i] <= text_len:
-            # Additional encryption using XOR with magic square and offset
-            ciphertext[i] = \
-                chr(ord(text[layout[i] - 1]) ^ offset)
-        else:
-            ciphertext[i] = empty
+    while True:
+        for i in range(layout.size):
+            if layout[i] <= text_len:
+                # Additional encryption using XOR with magic square and offset
+                ciphertext[i] = \
+                    chr(ord(text[layout[i] - 1]) ^ offset)
+            else:
+                ciphertext[i] = empty
+        # Make sure that text was encrypted successfully
+        if len(''.join(ciphertext)) == layout.size:
+            break
+        # Change offset if not
+        offset = (offset + 1) % MAX_OFFSET
 
     # Convert to binary
     # Adjust bits for binary values
@@ -167,7 +170,6 @@ def encrypt_enhanced(
     key = ''.join([f"{i:0{bits}b}" for i in layout])
     # Add binary values length to the key
     key = f"{bits:b}{delimiter}{offset:b}{delimiter}{key}"
-    # key = f"{bits:b}{delimiter}{offset:b}{delimiter}{key}"
 
     return key, ''.join(ciphertext)
 

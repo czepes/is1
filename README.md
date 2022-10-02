@@ -4,7 +4,7 @@ Cipher program that encrypts and decrypts text using magic squares.
 
 Magic Squares are built using:
 - Siamese method (odd order)
-- Narayana-De la Hire's method (even order)
+- ~~Narayana-De la Hire's method (even order)~~
 - Generic Pattern (doubly even order)
 
 In addition, during encryption, Magic Squares can be randomly transformed with:

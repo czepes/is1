@@ -24,8 +24,6 @@ def create_square(size: int) -> np.ndarray:
             return create_odd_square(size)
         elif size % 4 == 0:
             return create_double_even_square(size)
-        elif size % 2 == 0:
-            return create_even_square(size)
         size += 1
 
 
@@ -133,14 +131,6 @@ def create_even_square(size: int) -> np.ndarray:
     replace = dict([(alphabet_a[i], alphabet_b[i]) for i in range(size)])
 
     # Fill main and skew diagonals
-    # for i in range(size):
-    #     square_a[i, i] = alphabet_a[i]
-    # for i in range(size):
-    #     if i % 2 == 0:
-    #         index = (i + 1) % size
-    #     else:
-    #         index = (i - 1) % size
-    #     square_a[size - i - 1, i] = alphabet_a[index]
     for i in range(size):
         square_a[i, i] = alphabet_a[i]
         square_a[size - i - 1, i] = alphabet_a[i]
@@ -192,8 +182,8 @@ def transform_magic_square(
     if amount < 0:
         amount = order
 
-    # Operations 3 and 4 cannot be performed for squares of order 3!
-    operations = 2 if order == 3 else 4
+    # Operations 3 and 4 cannot be performed for squares of even order or order 3!
+    operations = 2 if order == 3 or (order % 4 != 0 and order % 2 == 0) else 4
 
     for _ in range(amount):
         # Randomly get operation number
